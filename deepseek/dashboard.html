@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voceo POS - Dashboard Mejorado</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="voceo-dashboard.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Sidebar -->
+        <div class="sidebar d-none d-lg-block" id="sidebar">
+            <div class="logo-brand">
+                <i class="fas fa-mug-hot"></i> Voceo POS
+            </div>
+            <nav class="nav flex-column">
+                <a class="nav-link active" href="#">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a class="nav-link" href="#">
+                    <i class="fas fa-cash-register"></i> Punto de Venta
+                </a>
+                <a class="nav-link" href="#">
+                    <i class="fas fa-chart-line"></i> Finanzas
+                </a>
+                <a class="nav-link" href="#">
+                    <i class="fas fa-boxes"></i> Inventario
+                </a>
+                <a class="nav-link" href="#">
+                    <i class="fas fa-receipt"></i> Cortes de Caja
+                </a>
+                <a class="nav-link" href="#">
+                    <i class="fas fa-utensils"></i> Recetas
+                </a>
+                <a class="nav-link" href="#">
+                    <i class="fas fa-store"></i> Sucursales
+                </a>
+                <a class="nav-link" href="#">
+                    <i class="fas fa-chart-bar"></i> Reportes
+                </a>
+                <a class="nav-link" href="#">
+                    <i class="fas fa-cogs"></i> Configuración
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-sm btn-outline-secondary me-3 d-lg-none" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="top-bar-title">Dashboard de Cafetería</div>
+                </div>
+                <div class="user-profile">
+                    <span class="user-profile-name">Ricardo</span>
+                    <div class="user-profile-icon">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="dashboard-grid mb-4">
+                <div class="filters-bar">
+                    <div class="d-flex align-items-center gap-3">
+                        <label for="branch-select" class="form-label mb-0">Sucursal:</label>
+                        <select id="branch-select" class="form-select w-auto">
+                            <option value="all">Todas</option>
+                            <option value="sucursal1">Sucursal 1</option>
+                            <option value="sucursal2">Sucursal 2</option>
+                            <option value="sucursal3">Sucursal 3</option>
+                        </select>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <label for="start-date" class="form-label mb-0">Rango de fechas:</label>
+                        <input type="date" id="start-date" class="form-control w-auto">
+                        <span class="text-muted">a</span>
+                        <input type="date" id="end-date" class="form-control w-auto">
+                    </div>
+                    <button class="btn btn-filter" id="apply-filters">
+                        <i class="fas fa-filter me-1"></i> Aplicar Filtros
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="dashboard-grid">
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card-kpi text-center">
+                            <h5 class="card-title"><i class="fas fa-dollar-sign"></i> Ventas del día</h5>
+                            <h2 class="kpi-value" id="sales-today">$8,450</h2>
+                            <p class="kpi-text">
+                                124 transacciones
+                                <br>
+                                <span class="badge bg-success">
+                                    +12.5% vs. ayer
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card-kpi text-center">
+                            <h5 class="card-title"><i class="fas fa-fire"></i> Producto estrella</h5>
+                            <h2 class="kpi-value" id="top-product">Latte Vainilla</h2>
+                            <p class="kpi-text">$350.25 en ventas</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card-kpi text-center">
+                            <h5 class="card-title"><i class="fas fa-exclamation-triangle"></i> Alertas activas</h5>
+                            <h2 class="kpi-value" id="alerts-count">5</h2>
+                            <p class="kpi-text">Revisar inventario y operaciones</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card-kpi text-center">
+                            <h5 class="card-title"><i class="fas fa-cash-register"></i> Corte de caja</h5>
+                            <h2 class="kpi-value" id="register-status">Cerrado</h2>
+                            <p class="kpi-text">Último: 19:30</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráficas y Alertas -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-8">
+                        <div class="chart-container">
+                            <h5 class="card-title mb-3"><i class="fas fa-chart-line"></i> Tendencia de ventas</h5>
+                            <div class="chart-wrapper">
+                                <canvas id="salesTrendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card-alerts">
+                            <h5 class="card-title mb-3"><i class="fas fa-bell"></i> Alertas</h5>
+                            <div id="alerts-list">
+                                <a href="#" class="alert-item low-stock">
+                                    <i class="icon fas fa-exclamation-triangle text-warning"></i>
+                                    <span>Inventario bajo: Leche (10L)</span>
+                                </a>
+                                <a href="#" class="alert-item discrepancy">
+                                    <i class="icon fas fa-exclamation-circle text-danger"></i>
+                                    <span>Diferencia en corte: Sucursal 2</span>
+                                </a>
+                                <a href="#" class="alert-item discount">
+                                    <i class="icon fas fa-tags text-primary"></i>
+                                    <span>Descuento > $50 en orden #521</span>
+                                </a>
+                                <a href="#" class="alert-item low-stock">
+                                    <i class="icon fas fa-exclamation-triangle text-warning"></i>
+                                    <span>Producto a punto de agotarse: Café de Altura</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráficas adicionales -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-6">
+                        <div class="chart-container">
+                            <h5 class="card-title mb-3"><i class="fas fa-store"></i> Ventas por Sucursal</h5>
+                            <div class="chart-wrapper">
+                                <canvas id="branchSalesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="chart-container">
+                            <h5 class="card-title mb-3"><i class="fas fa-credit-card"></i> Formas de Pago</h5>
+                            <div class="chart-wrapper">
+                                <canvas id="paymentChart"></canvas>
+                            </div>
+                            <div class="chart-legend">
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background-color: #D2B464;"></div>
+                                    <span>Efectivo</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background-color: #E97A3A;"></div>
+                                    <span>Tarjeta</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background-color: #234330;"></div>
+                                    <span>Transferencia</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top productos y Asistente IA -->
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <div class="card-charts">
+                            <h5 class="card-title mb-3"><i class="fas fa-trophy"></i> Top 5 Productos</h5>
+                            <ul class="list-unstyled">
+                                <li class="top-product-item">
+                                    <span>#1. Latte Vainilla</span>
+                                    <span class="fw-bold">$350.25</span>
+                                </li>
+                                <li class="top-product-item">
+                                    <span>#2. Muffin de Chocolate</span>
+                                    <span class="fw-bold">$215.00</span>
+                                </li>
+                                <li class="top-product-item">
+                                    <span>#3. Frapé Oreo</span>
+                                    <span class="fw-bold">$180.75</span>
+                                </li>
+                                <li class="top-product-item">
+                                    <span>#4. Té Chai</span>
+                                    <span class="fw-bold">$150.00</span>
+                                </li>
+                                <li class="top-product-item">
+                                    <span>#5. Café Americano</span>
+                                    <span class="fw-bold">$120.50</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card-ai">
+                            <h5 class="card-title mb-3"><i class="fas fa-robot"></i> Asistente de Gerencia</h5>
+                            <p class="kpi-text">Obtén un análisis de desempeño y sugerencias estratégicas basadas en tus KPI.</p>
+                            <button class="btn btn-ai w-100" id="generate-insights">
+                                <i class="fas fa-magic me-2"></i> Generar Análisis
+                            </button>
+                            <div id="ai-insights-output"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón móvil para toggle del sidebar -->
+    <div class="mobile-nav-toggle" id="mobileSidebarToggle">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JavaScript personalizado -->
+    <script src="voceo-dashboard.js"></script>
+</body>
+</html>
