@@ -1,128 +1,147 @@
 <?php
-use Terrena\Core\Auth;
-$base = $GLOBALS['__BASE__'] ?? '';     // p.ej. /terrena/Terrena
-$user = Auth::user();
-?><!DOCTYPE html>
+// layout.php
+// Este layout envuelve todas las vistas. Requiere Bootstrap 5, FontAwesome y Chart.js en <head>.
+?>
+<!doctype html>
 <html lang="es">
 <head>
-  <base href="<?= htmlspecialchars($base . '/', ENT_QUOTES) ?>">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Voceo POS – <?= htmlspecialchars($title ?? '') ?></title>
-
-  <!-- Bootstrap + Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <title>SelemTI POS | Terrena</title>
+  <script>
+    window.__BASE__ = '<?= htmlspecialchars($GLOBALS['__BASE__'] ?? '') ?>';
+  </script>
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
-  <!-- Fuentes locales -->
-  <style>
-    @font-face{font-family:'Montserrat';src:url('assets/font/Montserrat/static/Montserrat-Regular.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}
-    @font-face{font-family:'Montserrat';src:url('assets/font/Montserrat/static/Montserrat-Bold.ttf') format('truetype');font-weight:700;font-style:normal;font-display:swap}
-    @font-face{font-family:'Anton';src:url('assets/font/Anton/Anton-Regular.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}
-  </style>
-
-  <!-- Estilos del proyecto -->
-  <link rel="stylesheet" href="assets/css/terrena.css">
-
-  <!-- Chart.js (las vistas lo usan) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Terrena CSS -->
+  <link href="/terrena/Terrena/assets/css/terrena.css" rel="stylesheet">
 </head>
 <body>
-<div class="container-fluid p-0 d-flex" style="min-height:100vh;">
-  <!-- Sidebar -->
-  <aside class="sidebar d-none d-lg-flex flex-column" id="sidebar">
-    <div class="logo-brand"><i class="fa-solid fa-mug-hot me-2"></i>Voceo POS</div>
-    <nav class="nav flex-column">
-      <?php if (Auth::can('dashboard.view')): ?>
-        <a class="nav-link <?= ($title??'')==='Dashboard'?'active':'' ?>" href="dashboard"><i class="fa-solid fa-gauge"></i> Dashboard</a>
-      <?php endif; ?>
-      <?php if (Auth::can('cashcuts.view')): ?>
-        <a class="nav-link <?= ($title??'')==='Cortes de caja'?'active':'' ?>" href="caja/cortes"><i class="fa-solid fa-cash-register"></i> Cortes de Caja</a>
-      <?php endif; ?>
-      <?php if (Auth::can('inventory.view')): ?>
-        <a class="nav-link <?= ($title??'')==='Inventario'?'active':'' ?>" href="inventario"><i class="fa-solid fa-boxes-stacked"></i> Inventario</a>
-      <?php endif; ?>
-      <?php if (Auth::can('purchasing.view')): ?>
-        <a class="nav-link <?= ($title??'')==='Compras'?'active':'' ?>" href="compras"><i class="fa-solid fa-receipt"></i> Compras</a>
-      <?php endif; ?>
-      <?php if (Auth::can('recipes.view')): ?>
-        <a class="nav-link <?= ($title??'')==='Recetas & Costos'?'active':'' ?>" href="recetas"><i class="fa-solid fa-utensils"></i> Recetas</a>
-      <?php endif; ?>
-      <?php if (Auth::can('production.view')): ?>
-        <a class="nav-link <?= ($title??'')==='Producción'?'active':'' ?>" href="produccion"><i class="fa-solid fa-kitchen-set"></i> Producción</a>
-      <?php endif; ?>
-      <?php if (Auth::can('reports.view')): ?>
-        <a class="nav-link <?= ($title??'')==='Reportes'?'active':'' ?>" href="reportes"><i class="fa-solid fa-chart-line"></i> Reportes</a>
-      <?php endif; ?>
-      <?php if (Auth::can('admin.view')): ?>
-        <a class="nav-link <?= ($title??'')==='Admin'?'active':'' ?>" href="admin"><i class="fa-solid fa-gear"></i> Configuración</a>
-      <?php endif; ?>
-      <?php if (Auth::can('people.view')): ?>
-        <a class="nav-link <?= ($title??'')==='Personal'?'active':'' ?>" href="personal"><i class="fa-solid fa-users"></i> Personal</a>
-      <?php endif; ?>
-    </nav>
-  </aside>
-
-  <!-- Main -->
-  <main class="main-content flex-grow-1">
-    <!-- Top bar -->
-    <div class="top-bar">
-      <div class="d-flex align-items-center gap-2">
-        <button class="btn btn-sm btn-outline-secondary d-lg-none" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
-        <h1 class="top-bar-title m-0"><?= htmlspecialchars($title ?? '') ?></h1>
-      </div>
-
-      <!-- Usuario + reloj + menú -->
-      <div class="d-flex align-items-center gap-3">
-        <div class="d-none d-md-flex align-items-center text-muted small">
-          <i class="fa-regular fa-clock me-2"></i>
-          <span id="live-clock">--:--:--</span>
-        </div>
-
-        <div class="dropdown">
-          <button class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-2" data-bs-toggle="dropdown">
-            <div class="user-profile-icon"><i class="fa-solid fa-user"></i></div>
-            <span class="fw-semibold d-none d-sm-inline"><?= htmlspecialchars($user['fullname'] ?? 'Usuario') ?></span>
-            <i class="fa-solid fa-chevron-down small"></i>
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end shadow">
-            <li class="dropdown-header">
-              <div class="small text-muted">Conectado como</div>
-              <div class="fw-semibold"><?= htmlspecialchars($user['username'] ?? 'user') ?></div>
-            </li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="personal"><i class="fa-regular fa-id-card me-2"></i>Mi perfil</a></li>
-            <li><a class="dropdown-item" href="admin"><i class="fa-solid fa-gear me-2"></i>Configuración</a></li>
-            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-key me-2"></i>Cambiar contraseña</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-right-from-bracket me-2"></i>Cerrar sesión</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- Contenido de cada vista -->
-    <div class="dashboard-grid">
-      <?= $content ?? '' ?>
-    </div>
-
-    <!-- Footer / barra de estado -->
-    <footer class="status-bar">
-      <div class="container-status">
-        <span class="me-3"><i class="fa-solid fa-store me-1"></i> Sucursal: <strong>PRINCIPAL</strong></span>
-        <span class="me-3"><i class="fa-regular fa-calendar me-1"></i> <span id="live-date">--/--/----</span></span>
-        <span><i class="fa-regular fa-clock me-1"></i> <span id="live-clock-bottom">--:--:--</span></span>
-      </div>
-    </footer>
-  </main>
+  <div class="container-fluid p-0 d-flex" style="min-height:100vh">
+    <!-- Sidebar -->
+    <aside class="sidebar flex-column" id="sidebar">
+<div class="logo-brand mb-3 d-flex align-items-center justify-content-center">
+  
+<a href="/terrena/Terrena/dashboard" class="text-decoration-none">
+    <img src="/terrena/Terrena/assets/img/logo.svg" id="logoImg" alt="Terrena" style="height:44px">
+  </a>
+  
 </div>
+<hr style="margin:0">
+      <nav class="nav flex-column gap-1">
+        <a class="nav-link <?php echo ($active ?? '')==='dashboard'?'active':'' ?>" href="/terrena/Terrena/dashboard">
+          <i class="fa-solid fa-gauge"></i> <span class="label">Dashboard</span>
+        </a>
+        <a class="nav-link <?php echo ($active ?? '')==='cortes'?'active':'' ?>" href="/terrena/Terrena/caja/cortes">
+          <i class="fa-solid fa-cash-register"></i> <span class="label">Cortes de Caja</span>
+        </a>
+        <a class="nav-link <?php echo ($active ?? '')==='inventario'?'active':'' ?>" href="/terrena/Terrena/inventario">
+          <i class="fa-solid fa-boxes-stacked"></i> <span class="label">Inventario</span>
+        </a>
+        <a class="nav-link <?php echo ($active ?? '')==='compras'?'active':'' ?>" href="/terrena/Terrena/compras">
+          <i class="fa-solid fa-truck"></i> <span class="label">Compras</span>
+        </a>
+        <a class="nav-link <?php echo ($active ?? '')==='recetas'?'active':'' ?>" href="/terrena/Terrena/recetas">
+          <i class="fa-solid fa-bowl-food"></i> <span class="label">Recetas</span>
+        </a>
+        <a class="nav-link <?php echo ($active ?? '')==='produccion'?'active':'' ?>" href="/terrena/Terrena/produccion">
+          <i class="fa-solid fa-industry"></i> <span class="label">Producción</span>
+        </a>
+        <a class="nav-link <?php echo ($active ?? '')==='reportes'?'active':'' ?>" href="/terrena/Terrena/reportes">
+          <i class="fa-solid fa-chart-column"></i> <span class="label">Reportes</span>
+        </a>
+        <a class="nav-link <?php echo ($active ?? '')==='config'?'active':'' ?>" href="/terrena/Terrena/admin">
+          <i class="fa-solid fa-gear"></i> <span class="label">Configuración</span>
+        </a>
+        <a class="nav-link <?php echo ($active ?? '')==='personal'?'active':'' ?>" href="/terrena/Terrena/personal">
+          <i class="fa-solid fa-user-group"></i> <span class="label">Personal</span>
+        </a>
+      </nav>
+      <button class="btn btn-sm btn-outline-secondary d-none d-lg-inline-flex ms-2" id="sidebarCollapse" aria-label="Colapsar menú">
+    <i class="fa-solid fa-angles-left"></i>
+  </button>
+	</aside>
 
-<!-- Toggle móvil flotante -->
-<button class="mobile-nav-toggle d-lg-none" id="mobileSidebarToggle" aria-label="Menú"><i class="fa-solid fa-bars"></i></button>
+    <!-- Contenido principal -->
+    <main class="main-content flex-grow-1">
+      <!-- Top bar sticky -->
+      <div class="top-bar sticky-top">
+        <div class="d-flex align-items-center gap-2">
+          <!-- Móvil: hamburguesa -->
+          <button class="btn btn-sm btn-outline-secondary d-lg-none" id="sidebarToggleMobile" aria-label="Menú">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <!-- Desktop: colapsar/expandir -->
 
-<!-- Bootstrap JS + JS del proyecto -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="assets/js/terrena.js"></script>
+          <h1 class="top-bar-title mb-0"><?php echo $title ?? 'Dashboard' ?></h1>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+          <!-- Reloj/Fecha (ocultos en móvil por CSS) -->
+          <div class="text-secondary small">
+            <i class="fa-regular fa-clock me-1"></i><span id="live-clock">--:--</span>
+          </div>
+          <div class="text-secondary small">
+            <i class="fa-regular fa-calendar me-1"></i><span id="live-date">--/--/----</span>
+          </div>
+
+          <!-- Alertas header -->
+          <div class="dropdown">
+            <button class="btn btn-outline-secondary position-relative" data-bs-toggle="dropdown">
+              <i class="fa-regular fa-bell"></i>
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="hdr-alerts-badge">0</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end p-0" style="min-width:320px">
+              <div class="px-3 py-2 border-bottom d-flex justify-content-between align-items-center">
+                <strong>Alertas</strong>
+                <a href="/terrena/Terrena/reportes" class="link-more small">Ver todas <i class="fa-solid fa-chevron-right ms-1"></i></a>
+              </div>
+              <div id="hdr-alerts-list" class="py-1"></div>
+            </div>
+          </div>
+
+          <!-- Usuario -->
+          <div class="dropdown">
+            <button class="btn btn-light d-inline-flex align-items-center gap-2" data-bs-toggle="dropdown">
+              <span class="user-profile-icon"><i class="fa-solid fa-user"></i></span>
+              <span>Juan Pérez</span>
+              <i class="fa-solid fa-chevron-down small"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="/terrena/Terrena/personal">Mi perfil</a></li>
+              <li><a class="dropdown-item" href="/terrena/Terrena/admin">Configuración</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="/terrena/Terrena/logout">Cerrar sesión</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- AQUÍ se imprime el contenido de cada vista -->
+      <?php echo $content ?? '' ?>
+
+      <!-- Footer / Barra de estado -->
+      <footer class="status-bar mt-auto">
+        <div class="container-status">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-store"></i>
+            <span>Sucursal: <strong>PRINCIPAL</strong></span>
+          </div>
+          <div class="ms-auto d-flex align-items-center gap-3">
+            <span id="live-clock-bottom" class="text-secondary">--:--</span>
+          </div>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Bootstrap JS + Terrena JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/terrena/Terrena/assets/js/terrena.js"></script>
 </body>
 </html>
